@@ -53,14 +53,19 @@ fn sync_claude_provider_writes_live_settings() {
     );
 
     let live_value: serde_json::Value = read_json_file(&settings_path).expect("read live file");
-    assert_eq!(live_value, provider_config);
+    let mut expected = provider_config.clone();
+    expected.as_object_mut().unwrap().insert(
+        "attribution".to_string(),
+        json!({ "commit": "", "pr": "" }),
+    );
+    assert_eq!(live_value, expected);
 
     // 确认 SSOT 中的供应商也同步了最新内容
     let updated = config
         .get_manager(&AppType::Claude)
         .and_then(|m| m.providers.get("prov-1"))
         .expect("provider in config");
-    assert_eq!(updated.settings_config, provider_config);
+    assert_eq!(updated.settings_config, expected);
 
     // 额外确认写入位置位于测试 HOME 下
     assert!(

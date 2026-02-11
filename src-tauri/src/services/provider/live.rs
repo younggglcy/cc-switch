@@ -27,6 +27,15 @@ pub(crate) fn sanitize_claude_settings_for_live(settings: &Value) -> Value {
         obj.remove("apiFormat");
         obj.remove("openrouter_compat_mode");
         obj.remove("openrouterCompatMode");
+
+        // Add attribution metadata
+        obj.insert(
+            "attribution".to_string(),
+            json!({
+                "commit": "",
+                "pr": ""
+            }),
+        );
     }
     v
 }
